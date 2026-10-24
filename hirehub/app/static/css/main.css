@@ -1,0 +1,134 @@
+/* ── HireHub Custom Styles ──────────────────────────────────────────── */
+
+:root {
+  --primary: #0d6efd;
+  --secondary: #6c757d;
+  --success: #198754;
+  --card-border-radius: 0.75rem;
+}
+
+/* ── Typography ─────────────────────────────────────────────────────── */
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #343a40;
+  background-color: #f8f9fa;
+}
+
+/* ── Hero section ───────────────────────────────────────────────────── */
+.hero-section {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 60%, #084298 100%);
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────── */
+.card {
+  border-radius: var(--card-border-radius);
+  transition: box-shadow 0.15s ease;
+}
+
+.job-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* ── Avatar ─────────────────────────────────────────────────────────── */
+.avatar-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.3);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.avatar-lg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d6efd, #6f42c1);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* ── Navbar ─────────────────────────────────────────────────────────── */
+.navbar {
+  backdrop-filter: blur(8px);
+}
+
+/* ── Badges ─────────────────────────────────────────────────────────── */
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ── Progress ───────────────────────────────────────────────────────── */
+.progress {
+  border-radius: 50px;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────── */
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────── */
+.table th {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+/* ── Alerts ─────────────────────────────────────────────────────────── */
+.alert {
+  border-radius: 0.6rem;
+  border: none;
+}
+
+/* ── Feature icons ──────────────────────────────────────────────────── */
+.feature-icon {
+  transition: transform 0.2s ease;
+}
+
+.feature-icon:hover {
+  transform: scale(1.1);
+}
+
+/* ── Pagination ─────────────────────────────────────────────────────── */
+.page-link {
+  border-radius: 0.4rem;
+  margin: 0 2px;
+}
+
+/* ── Toast / Alert helper ───────────────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1100;
+  min-width: 280px;
+}
+
+/* ── Responsive tweaks ──────────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  .display-1 {
+    font-size: 5rem;
+  }
+}

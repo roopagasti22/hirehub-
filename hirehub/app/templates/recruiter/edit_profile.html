@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-pencil-square me-1 text-primary"></i>Edit Recruiter Profile
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('web.recruiter.edit_profile') }}">
+            <h6 class="fw-bold mb-3 text-muted">Personal Details</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Full Name</label>
+                <input type="text" class="form-control" name="name" value="{{ profile.name }}" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Phone</label>
+                <input type="tel" class="form-control" name="phone" value="{{ profile.phone or '' }}" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Designation</label>
+                <input type="text" class="form-control" name="designation" value="{{ profile.designation or '' }}" placeholder="e.g. HR Manager" />
+              </div>
+            </div>
+
+            {% if company %}
+            <h6 class="fw-bold mb-3 text-muted">Company Details</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Company Name</label>
+                <input type="text" class="form-control" name="company_name" value="{{ company.name }}" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Industry</label>
+                <input type="text" class="form-control" name="industry" value="{{ company.industry or '' }}" placeholder="Technology, Finance..." />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Website</label>
+                <input type="url" class="form-control" name="website" value="{{ company.website or '' }}" placeholder="https://..." />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Company Location</label>
+                <input type="text" class="form-control" name="company_location" value="{{ company.location or '' }}" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Company Size</label>
+                <select class="form-select" name="company_size">
+                  <option value="">Select size</option>
+                  {% for size in ['1-10','11-50','51-200','201-500','501-1000','1000+'] %}
+                  <option value="{{ size }}" {% if company.size == size %}selected{% endif %}>{{ size }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Company Description</label>
+                <textarea class="form-control" name="company_description" rows="3" placeholder="Tell candidates about your company...">{{ company.description or '' }}</textarea>
+              </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+              <a href="{{ url_for('web.recruiter.profile') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

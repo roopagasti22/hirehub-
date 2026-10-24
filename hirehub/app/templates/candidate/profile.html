@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-4 mb-4">
+      <div class="card border-0 shadow-sm text-center">
+        <div class="card-body py-4">
+          <div class="avatar-lg mx-auto mb-3">{{ profile.name[0]|upper }}</div>
+          <h5 class="fw-bold mb-0">{{ profile.name }}</h5>
+          <p class="text-muted small">{{ profile.email }}</p>
+          <p class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ profile.phone or 'Not set' }}</p>
+          <p class="small text-muted"><i class="bi bi-geo-alt me-1"></i>{{ profile.location or 'Not set' }}</p>
+          <div class="mt-3">
+            <p class="small text-muted mb-1">Profile Completion</p>
+            <div class="progress" style="height:10px;">
+              <div class="progress-bar {% if profile.profile_complete >= 80 %}bg-success{% elif profile.profile_complete >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                style="width:{{ profile.profile_complete }}%;"></div>
+            </div>
+            <p class="small text-muted mt-1">{{ profile.profile_complete }}%</p>
+          </div>
+          <div class="d-grid gap-2 mt-3">
+            <a href="{{ url_for('web.candidate.edit_profile') }}" class="btn btn-primary btn-sm">
+              <i class="bi bi-pencil me-1"></i>Edit Profile
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resume Card -->
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-file-earmark-person me-1 text-primary"></i>Resume
+        </div>
+        <div class="card-body">
+          {% if resume %}
+          <p class="small text-success mb-2"><i class="bi bi-check-circle me-1"></i>{{ resume.original_filename }}</p>
+          <p class="text-muted small">Uploaded: {{ resume.uploaded_at[:10] if resume.uploaded_at }}</p>
+          <a href="{{ url_for('web.candidate.download_resume', resume_id=resume._id) }}" class="btn btn-outline-primary btn-sm w-100 mb-2">
+            <i class="bi bi-download me-1"></i>Download
+          </a>
+          {% else %}
+          <p class="text-muted small text-center py-2">No resume uploaded.</p>
+          {% endif %}
+          <form method="POST" action="{{ url_for('web.candidate.upload_resume') }}" enctype="multipart/form-data">
+            <input type="file" class="form-control form-control-sm mb-2" name="resume" accept=".pdf,.doc,.docx" required />
+            <button type="submit" class="btn btn-success btn-sm w-100">
+              <i class="bi bi-upload me-1"></i>{{ 'Replace' if resume else 'Upload' }} Resume
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <!-- Skills -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white fw-bold"><i class="bi bi-tools me-1 text-primary"></i>Skills</div>
+        <div class="card-body">
+          {% if profile.skills %}
+          {% for skill in profile.skills %}
+          <span class="badge bg-primary-subtle text-primary me-1 mb-1 py-2 px-3">{{ skill }}</span>
+          {% endfor %}
+          {% else %}
+          <p class="text-muted small">No skills added yet. <a href="{{ url_for('web.candidate.edit_profile') }}">Add skills</a></p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Expected Salary / Notice Period -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white fw-bold"><i class="bi bi-currency-rupee me-1 text-success"></i>Job Preferences</div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p class="small text-muted mb-0">Expected Salary</p>
+              <p class="fw-semibold">{{ profile.expected_salary if profile.expected_salary else 'Not specified' }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="small text-muted mb-0">Notice Period</p>
+              <p class="fw-semibold">{{ (profile.notice_period|string + ' days') if profile.notice_period else 'Not specified' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Education -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white fw-bold d-flex justify-content-between">
+          <span><i class="bi bi-mortarboard me-1 text-info"></i>Education</span>
+        </div>
+        <div class="card-body">
+          {% if profile.education %}
+          {% for edu in profile.education %}
+          <div class="mb-2 border-bottom pb-2">
+            <p class="fw-semibold mb-0">{{ edu.degree or edu.get('institution','') }}</p>
+            <p class="text-muted small mb-0">{{ edu.institution or '' }} | {{ edu.year or '' }}</p>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="text-muted small">No education added. <a href="{{ url_for('web.candidate.edit_profile') }}">Add education</a></p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Experience -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold"><i class="bi bi-briefcase me-1 text-warning"></i>Experience</div>
+        <div class="card-body">
+          {% if profile.experience %}
+          {% for exp in profile.experience %}
+          <div class="mb-2 border-bottom pb-2">
+            <p class="fw-semibold mb-0">{{ exp.title or exp.get('role','') }}</p>
+            <p class="text-muted small mb-0">{{ exp.company or '' }} | {{ exp.years or '' }} years</p>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="text-muted small">No experience added. <a href="{{ url_for('web.candidate.edit_profile') }}">Add experience</a></p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

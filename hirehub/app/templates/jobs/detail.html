@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('web.jobs.job_list') }}">Jobs</a></li>
+      <li class="breadcrumb-item active">{{ job.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div>
+              <h2 class="fw-bold mb-1">{{ job.title }}</h2>
+              <p class="text-muted mb-2">
+                <i class="bi bi-building me-1"></i>
+                {% if company %}<strong>{{ company.name }}</strong>{% else %}Unknown Company{% endif %}
+                &nbsp;&bull;&nbsp;
+                <i class="bi bi-geo-alt me-1"></i>{{ job.location }}
+              </p>
+            </div>
+            <div class="d-flex gap-2">
+              <span class="badge bg-success-subtle text-success fs-6">{{ job.status|title }}</span>
+            </div>
+          </div>
+
+          <!-- Meta badges -->
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            <span class="badge bg-primary-subtle text-primary py-2 px-3">
+              <i class="bi bi-clock me-1"></i>{{ job.employment_type|replace('_',' ')|title }}
+            </span>
+            <span class="badge bg-info-subtle text-info py-2 px-3">
+              <i class="bi bi-house me-1"></i>{{ job.work_mode|title }}
+            </span>
+            <span class="badge bg-secondary-subtle text-secondary py-2 px-3">
+              <i class="bi bi-briefcase me-1"></i>{{ job.experience_min }} – {{ job.experience_max }} Years
+            </span>
+            {% if job.salary_min or job.salary_max %}
+            <span class="badge bg-success-subtle text-success py-2 px-3">
+              <i class="bi bi-currency-rupee me-1"></i>
+              {{ job.salary_min|int if job.salary_min else '?' }} – {{ job.salary_max|int if job.salary_max else '?' }}
+            </span>
+            {% endif %}
+          </div>
+
+          <!-- Description -->
+          <h5 class="fw-bold">Job Description</h5>
+          <div class="text-muted mb-4" style="white-space:pre-line;">{{ job.description }}</div>
+
+          <!-- Skills -->
+          <h5 class="fw-bold mb-2">Required Skills</h5>
+          <div class="mb-4">
+            {% for skill in (job.skills or []) %}
+            <span class="badge bg-primary-subtle text-primary me-1 mb-1 py-2 px-3">{{ skill }}</span>
+            {% endfor %}
+          </div>
+
+          <!-- Deadline -->
+          {% if job.deadline %}
+          <p class="text-danger small">
+            <i class="bi bi-calendar-x me-1"></i>
+            Application deadline: {{ job.deadline[:10] if job.deadline }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Match Score Card (for candidates) -->
+      {% if match_result %}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-bold border-bottom">
+          <i class="bi bi-graph-up-arrow me-1 text-primary"></i>Your Match Score
+        </div>
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-md-3 text-center">
+              <div class="match-circle mx-auto mb-2" style="width:90px;height:90px;">
+                <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e9ecef" stroke-width="3"/>
+                  <circle cx="18" cy="18" r="15.9" fill="none"
+                    stroke="{% if match_result.percentage >= 70 %}#198754{% elif match_result.percentage >= 40 %}#ffc107{% else %}#dc3545{% endif %}"
+                    stroke-width="3"
+                    stroke-dasharray="{{ match_result.percentage }}, 100" />
+                </svg>
+                <div style="margin-top:-66px;font-size:1.2rem;font-weight:bold;color:{% if match_result.percentage >= 70 %}#198754{% elif match_result.percentage >= 40 %}#856404{% else %}#dc3545{% endif %};">
+                  {{ match_result.percentage }}%
+                </div>
+              </div>
+              <p class="small text-muted fw-semibold">Match</p>
+            </div>
+            <div class="col-md-9">
+              {% if match_result.matched_skills %}
+              <p class="fw-semibold text-success mb-1">
+                <i class="bi bi-check-circle me-1"></i>Matched Skills
+              </p>
+              <div class="mb-2">
+                {% for skill in match_result.matched_skills %}
+                <span class="badge bg-success-subtle text-success me-1 mb-1">{{ skill }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+              {% if match_result.missing_skills %}
+              <p class="fw-semibold text-danger mb-1">
+                <i class="bi bi-x-circle me-1"></i>Missing Skills
+              </p>
+              <div>
+                {% for skill in match_result.missing_skills %}
+                <span class="badge bg-danger-subtle text-danger me-1 mb-1">{{ skill }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Apply Card -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-4 text-center">
+          {% if current_user_role == 'CANDIDATE' %}
+            {% if already_applied %}
+            <div class="alert alert-success mb-3 py-2">
+              <i class="bi bi-check-circle me-1"></i>Already Applied
+            </div>
+            {% else %}
+            <button onclick="applyJob('{{ job._id }}')" class="btn btn-primary btn-lg w-100 fw-bold mb-2" {% if job.status != 'OPEN' %}disabled{% endif %}>
+              <i class="bi bi-send me-1"></i>Apply Now
+            </button>
+            {% endif %}
+            {% if is_saved %}
+            <button onclick="unsaveJob('{{ job._id }}')" class="btn btn-outline-secondary w-100">
+              <i class="bi bi-bookmark-fill me-1"></i>Saved
+            </button>
+            {% else %}
+            <button onclick="saveJob('{{ job._id }}')" class="btn btn-outline-primary w-100">
+              <i class="bi bi-bookmark me-1"></i>Save Job
+            </button>
+            {% endif %}
+          {% elif not current_user_id %}
+          <p class="text-muted mb-3">Sign in to apply for this job.</p>
+          <a href="{{ url_for('web.auth.login') }}" class="btn btn-primary w-100">Login to Apply</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Company Card -->
+      {% if company %}
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3"><i class="bi bi-building me-1"></i>About the Company</h6>
+          <p class="fw-semibold mb-1">{{ company.name }}</p>
+          <p class="text-muted small mb-1">
+            <i class="bi bi-geo-alt me-1"></i>{{ company.location or 'N/A' }}
+          </p>
+          <p class="text-muted small mb-1">
+            <i class="bi bi-diagram-3 me-1"></i>{{ company.industry or 'N/A' }}
+          </p>
+          {% if company.website %}
+          <a href="{{ company.website }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+            <i class="bi bi-globe me-1"></i>Visit Website
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Job Details Card -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-1"></i>Job Details</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><i class="bi bi-calendar-event me-2 text-muted"></i>Posted: {{ job.posted_date[:10] if job.posted_date else 'N/A' }}</li>
+            {% if job.deadline %}
+            <li class="mb-2"><i class="bi bi-calendar-x me-2 text-danger"></i>Deadline: {{ job.deadline[:10] }}</li>
+            {% endif %}
+            <li class="mb-2"><i class="bi bi-briefcase me-2 text-muted"></i>{{ job.employment_type|replace('_',' ')|title }}</li>
+            <li class="mb-2"><i class="bi bi-house me-2 text-muted"></i>{{ job.work_mode|title }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function applyJob(jobId) {
+  if (!confirm('Submit your application for this job?')) return;
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/apply`, { method: 'POST', headers: {'Content-Type':'application/json'} });
+    const data = await res.json();
+    if (data.success) {
+      showAlert('Application submitted successfully!', 'success');
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      showAlert(data.message, 'danger');
+    }
+  } catch(e) {
+    showAlert('An error occurred. Please try again.', 'danger');
+  }
+}
+
+async function saveJob(jobId) {
+  try {
+    const res = await fetch(`/api/candidates/{{ current_user_id }}/save-job`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ job_id: jobId }),
+    });
+    const data = await res.json();
+    if (data.success) location.reload();
+  } catch(e) {}
+}
+
+async function unsaveJob(jobId) {
+  try {
+    const res = await fetch(`/api/candidates/{{ current_user_id }}/unsave-job`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ job_id: jobId }),
+    });
+    const data = await res.json();
+    if (data.success) location.reload();
+  } catch(e) {}
+}
+</script>
+{% endblock %}

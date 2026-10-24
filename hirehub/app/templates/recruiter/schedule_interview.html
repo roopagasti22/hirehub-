@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Schedule Interview{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-camera-video me-1 text-info"></i>Schedule Interview
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('web.recruiter.schedule_interview') }}">
+            <input type="hidden" name="application_id" value="{{ application_id }}" />
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Interview Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" name="date" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Time</label>
+              <input type="time" class="form-control" name="time" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Interview Type</label>
+              <select class="form-select" name="interview_type">
+                {% for t in ['ONLINE','PHONE','IN_PERSON'] %}
+                <option value="{{ t }}">{{ t|replace('_',' ')|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Meeting Link <span class="text-muted small">(for online)</span></label>
+              <input type="url" class="form-control" name="meeting_link" placeholder="https://meet.google.com/..." />
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-info text-white fw-bold">
+                <i class="bi bi-calendar-check me-1"></i>Schedule
+              </button>
+              <a href="{{ url_for('web.recruiter.interviews') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Recommended Jobs{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-stars me-2 text-warning"></i>Recommended Jobs</h4>
+  <p class="text-muted mb-4">Jobs matched to your skills and profile.</p>
+
+  {% if recommendations %}
+  <div class="row g-4">
+    {% for job in recommendations %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="badge bg-warning-subtle text-warning fs-6">{{ job.match_score }}% Match</span>
+            <span class="badge bg-{{ 'success' if job.work_mode == 'REMOTE' else 'info' }}-subtle text-{{ 'success' if job.work_mode == 'REMOTE' else 'info' }}">{{ job.work_mode|title }}</span>
+          </div>
+          <h5 class="fw-bold mb-1">
+            <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="text-decoration-none text-dark">{{ job.title }}</a>
+          </h5>
+          <p class="text-muted small mb-2"><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</p>
+          <div class="mb-2">
+            <p class="small fw-semibold text-success mb-1">Matched:</p>
+            {% for skill in job.matched_skills[:4] %}
+            <span class="badge bg-success-subtle text-success me-1 mb-1">{{ skill }}</span>
+            {% endfor %}
+          </div>
+          {% if job.missing_skills %}
+          <div>
+            <p class="small fw-semibold text-danger mb-1">Missing:</p>
+            {% for skill in job.missing_skills[:3] %}
+            <span class="badge bg-danger-subtle text-danger me-1 mb-1">{{ skill }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="btn btn-primary btn-sm w-100">View & Apply</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-stars fs-1 d-block mb-3 opacity-50"></i>
+    <h5>No recommendations available yet.</h5>
+    <p>Complete your profile and add skills to get personalised recommendations.</p>
+    <a href="{{ url_for('web.candidate.edit_profile') }}" class="btn btn-primary">Update Profile</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

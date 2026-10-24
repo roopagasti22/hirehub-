@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Browse Jobs{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white fw-bold">
+          <i class="bi bi-funnel me-1"></i>Filter Jobs
+        </div>
+        <div class="card-body">
+          <form method="GET" action="{{ url_for('web.jobs.job_list') }}" id="filterForm">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Keyword</label>
+              <input type="text" class="form-control form-control-sm" name="q" value="{{ filters.q }}" placeholder="Job title..." />
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Location</label>
+              <input type="text" class="form-control form-control-sm" name="location" value="{{ filters.location }}" placeholder="City or state..." />
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Skills</label>
+              <input type="text" class="form-control form-control-sm" name="skills" value="{{ filters.skills }}" placeholder="python, java, react..." />
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Work Mode</label>
+              <select class="form-select form-select-sm" name="work_mode">
+                <option value="">All</option>
+                {% for mode in ['REMOTE','HYBRID','ONSITE'] %}
+                <option value="{{ mode }}" {% if filters.work_mode == mode %}selected{% endif %}>{{ mode|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">Employment Type</label>
+              <select class="form-select form-select-sm" name="employment_type">
+                <option value="">All</option>
+                {% for et in ['FULL_TIME','PART_TIME','INTERNSHIP','CONTRACT'] %}
+                <option value="{{ et }}" {% if filters.employment_type == et %}selected{% endif %}>{{ et|replace('_',' ')|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+              <a href="{{ url_for('web.jobs.job_list') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Listings -->
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">
+          {{ pagination.total }} job{{ 's' if pagination.total != 1 }}
+          {% if filters.q %}for "{{ filters.q }}"{% endif %}
+        </h5>
+        <span class="text-muted small">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      </div>
+
+      {% for job in jobs %}
+      <div class="card border-0 shadow-sm mb-3 job-card">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="d-flex gap-2 mb-2 flex-wrap">
+                <span class="badge bg-primary-subtle text-primary">{{ job.employment_type|replace('_',' ')|title }}</span>
+                <span class="badge bg-{% if job.work_mode == 'REMOTE' %}success{% elif job.work_mode == 'HYBRID' %}info{% else %}secondary{% endif %}-subtle text-{% if job.work_mode == 'REMOTE' %}success{% elif job.work_mode == 'HYBRID' %}info{% else %}secondary{% endif %}">
+                  {{ job.work_mode|title }}
+                </span>
+                {% if job.status == 'OPEN' %}
+                <span class="badge bg-success-subtle text-success">Open</span>
+                {% else %}
+                <span class="badge bg-danger-subtle text-danger">{{ job.status|title }}</span>
+                {% endif %}
+              </div>
+              <h5 class="fw-bold mb-1">
+                <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="text-decoration-none text-dark">
+                  {{ job.title }}
+                </a>
+              </h5>
+              <p class="text-muted small mb-2">
+                <i class="bi bi-building me-1"></i>{{ job.company_name or 'Company' }}
+                &nbsp;&bull;&nbsp;
+                <i class="bi bi-geo-alt me-1"></i>{{ job.location }}
+                {% if job.experience_min is not none %}
+                &nbsp;&bull;&nbsp;
+                <i class="bi bi-briefcase me-1"></i>{{ job.experience_min }}–{{ job.experience_max }} yrs
+                {% endif %}
+              </p>
+              <div>
+                {% for skill in (job.skills or [])[:5] %}
+                <span class="badge bg-light text-dark border me-1 mb-1">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+              {% if job.salary_min or job.salary_max %}
+              <p class="text-success fw-semibold mb-2">
+                <i class="bi bi-currency-rupee"></i>
+                {{ (job.salary_min|int)//100000 if job.salary_min else '?' }}L – {{ (job.salary_max|int)//100000 if job.salary_max else '?' }}L
+              </p>
+              {% endif %}
+              <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="btn btn-primary btn-sm">View Job</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-briefcase-x fs-1 d-block mb-3 opacity-50"></i>
+        <h5>No jobs found matching your criteria.</h5>
+        <a href="{{ url_for('web.jobs.job_list') }}" class="btn btn-outline-primary mt-2">Clear Filters</a>
+      </div>
+      {% endfor %}
+
+      <!-- Pagination -->
+      {% if pagination.pages > 1 %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="?{% for k,v in filters.items() %}{{ k }}={{ v }}&{% endfor %}page={{ pagination.page - 1 }}">Previous</a>
+          </li>
+          {% for p in range(1, pagination.pages + 1) %}
+          <li class="page-item {% if p == pagination.page %}active{% endif %}">
+            <a class="page-link" href="?{% for k,v in filters.items() %}{{ k }}={{ v }}&{% endfor %}page={{ p }}">{{ p }}</a>
+          </li>
+          {% endfor %}
+          <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+            <a class="page-link" href="?{% for k,v in filters.items() %}{{ k }}={{ v }}&{% endfor %}page={{ pagination.page + 1 }}">Next</a>
+          </li>
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

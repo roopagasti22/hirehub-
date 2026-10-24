@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Edit Job{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-pencil me-1 text-primary"></i>Edit Job: {{ job.title }}
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('web.recruiter.edit_job', job_id=job._id) }}">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-semibold">Job Title</label>
+                <input type="text" class="form-control" name="title" value="{{ job.title }}" required />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Description</label>
+                <textarea class="form-control" name="description" rows="5">{{ job.description }}</textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Skills</label>
+                <input type="text" class="form-control" name="skills" value="{{ job.skills|join(', ') if job.skills }}" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Location</label>
+                <input type="text" class="form-control" name="location" value="{{ job.location }}" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Work Mode</label>
+                <select class="form-select" name="work_mode">
+                  {% for mode in ['ONSITE','REMOTE','HYBRID'] %}
+                  <option value="{{ mode }}" {% if job.work_mode == mode %}selected{% endif %}>{{ mode|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Employment Type</label>
+                <select class="form-select" name="employment_type">
+                  {% for et in ['FULL_TIME','PART_TIME','INTERNSHIP','CONTRACT'] %}
+                  <option value="{{ et }}" {% if job.employment_type == et %}selected{% endif %}>{{ et|replace('_',' ')|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Status</label>
+                <select class="form-select" name="status">
+                  {% for st in ['OPEN','CLOSED'] %}
+                  <option value="{{ st }}" {% if job.status == st %}selected{% endif %}>{{ st|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Min Exp (yrs)</label>
+                <input type="number" class="form-control" name="experience_min" value="{{ job.experience_min or 0 }}" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Max Exp (yrs)</label>
+                <input type="number" class="form-control" name="experience_max" value="{{ job.experience_max or 0 }}" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Salary Min (₹)</label>
+                <input type="number" class="form-control" name="salary_min" value="{{ job.salary_min or '' }}" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Salary Max (₹)</label>
+                <input type="number" class="form-control" name="salary_max" value="{{ job.salary_max or '' }}" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Deadline</label>
+                <input type="date" class="form-control" name="deadline" value="{{ job.deadline[:10] if job.deadline else '' }}" />
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+              <a href="{{ url_for('web.recruiter.my_jobs') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

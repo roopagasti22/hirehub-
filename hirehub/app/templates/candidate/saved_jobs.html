@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Saved Jobs{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-bookmark-fill me-2 text-primary"></i>Saved Jobs</h4>
+
+  {% if jobs %}
+  <div class="row g-3">
+    {% for job in jobs %}
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm job-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="badge bg-primary-subtle text-primary">{{ job.employment_type|replace('_',' ')|title }}</span>
+            <span class="badge bg-{{ 'success' if job.status == 'OPEN' else 'secondary' }}-subtle text-{{ 'success' if job.status == 'OPEN' else 'secondary' }}">{{ job.status|title }}</span>
+          </div>
+          <h5 class="fw-bold mb-1">
+            <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="text-decoration-none text-dark">{{ job.title }}</a>
+          </h5>
+          <p class="text-muted small mb-2"><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</p>
+          <div>
+            {% for skill in (job.skills or [])[:4] %}
+            <span class="badge bg-light text-dark border me-1 mb-1">{{ skill }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="card-footer bg-transparent d-flex gap-2">
+          <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="btn btn-primary btn-sm flex-grow-1">View Job</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-bookmark fs-1 d-block mb-3 opacity-50"></i>
+    <h5>No saved jobs yet.</h5>
+    <a href="{{ url_for('web.jobs.job_list') }}" class="btn btn-primary mt-2">Browse Jobs</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

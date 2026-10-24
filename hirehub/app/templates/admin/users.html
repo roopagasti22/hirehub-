@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h4 class="fw-bold mb-0"><i class="bi bi-people me-2 text-primary"></i>User Management</h4>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="?role=CANDIDATE" class="btn btn-sm btn-{{ 'primary' if role_filter == 'CANDIDATE' else 'outline-primary' }}">Candidates</a>
+      <a href="?role=RECRUITER" class="btn btn-sm btn-{{ 'success' if role_filter == 'RECRUITER' else 'outline-success' }}">Recruiters</a>
+      <a href="?" class="btn btn-sm btn-{{ 'secondary' if not role_filter else 'outline-secondary' }}">All</a>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Registered</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td class="fw-semibold">{{ u.name }}</td>
+              <td class="text-muted small">{{ u.email }}</td>
+              <td class="small">{{ u.phone or '-' }}</td>
+              <td>
+                <span class="badge bg-{{ 'primary' if u.role == 'CANDIDATE' else 'success' if u.role == 'RECRUITER' else 'danger' }}-subtle text-{{ 'primary' if u.role == 'CANDIDATE' else 'success' if u.role == 'RECRUITER' else 'danger' }}">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-{{ 'success' if u.status == 'ACTIVE' else 'danger' }}-subtle text-{{ 'success' if u.status == 'ACTIVE' else 'danger' }}">
+                  {{ u.status }}
+                </span>
+              </td>
+              <td class="small text-muted">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '-' }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('web.admin.toggle_user', user_id=u._id) }}" class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-{{ 'danger' if u.status == 'ACTIVE' else 'success' }}"
+                    onclick="return confirm('Toggle user status?')">
+                    {{ 'Deactivate' if u.status == 'ACTIVE' else 'Activate' }}
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No users found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if pages > 1 %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% for p in range(1, pages+1) %}
+      <li class="page-item {% if p == page %}active{% endif %}">
+        <a class="page-link" href="?role={{ role_filter }}&page={{ p }}">{{ p }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

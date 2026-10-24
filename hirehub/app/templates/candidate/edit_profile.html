@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-pencil-square me-1 text-primary"></i>Edit Profile
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('web.candidate.edit_profile') }}">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Full Name</label>
+                <input type="text" class="form-control" name="name" value="{{ profile.name }}" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Phone</label>
+                <input type="tel" class="form-control" name="phone" value="{{ profile.phone or '' }}" />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Location</label>
+                <input type="text" class="form-control" name="location" value="{{ profile.location or '' }}" placeholder="City, State" />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Skills <span class="text-muted small">(comma-separated)</span></label>
+                <input type="text" class="form-control" name="skills" value="{{ profile.skills|join(', ') if profile.skills }}" placeholder="python, javascript, sql..." />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Expected Salary (₹)</label>
+                <input type="number" class="form-control" name="expected_salary" value="{{ profile.expected_salary or '' }}" placeholder="Annual CTC" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Notice Period (days)</label>
+                <input type="number" class="form-control" name="notice_period" value="{{ profile.notice_period or '' }}" placeholder="e.g. 30" />
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+              <a href="{{ url_for('web.candidate.profile') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

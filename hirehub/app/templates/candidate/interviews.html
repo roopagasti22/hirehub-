@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}My Interviews{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-camera-video me-2 text-info"></i>My Interviews</h4>
+
+  {% if interviews %}
+  <div class="row g-3">
+    {% for iv in interviews %}
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <h6 class="fw-bold">{{ iv.get('job_title','Interview') }}</h6>
+            <span class="badge bg-{{ 'success' if iv.status == 'SCHEDULED' else 'secondary' if iv.status == 'COMPLETED' else 'danger' }}-subtle text-{{ 'success' if iv.status == 'SCHEDULED' else 'secondary' if iv.status == 'COMPLETED' else 'danger' }}">
+              {{ iv.status|title }}
+            </span>
+          </div>
+          <p class="text-muted small mb-1">
+            <i class="bi bi-calendar me-1"></i>{{ iv.date[:10] if iv.date else '–' }}
+            &nbsp;|&nbsp;
+            <i class="bi bi-clock me-1"></i>{{ iv.time or '–' }}
+          </p>
+          <p class="text-muted small mb-1">
+            <i class="bi bi-camera-video me-1"></i>Type: {{ iv.interview_type|title }}
+          </p>
+          {% if iv.meeting_link %}
+          <a href="{{ iv.meeting_link }}" target="_blank" class="btn btn-outline-primary btn-sm mt-1">
+            <i class="bi bi-link-45deg me-1"></i>Join Meeting
+          </a>
+          {% endif %}
+          {% if iv.feedback %}
+          <div class="alert alert-light mt-2 py-2 small mb-0">
+            <i class="bi bi-chat-left-text me-1"></i><strong>Feedback:</strong> {{ iv.feedback }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-calendar-x fs-1 d-block mb-3 opacity-50"></i>
+    <h5>No interviews scheduled yet.</h5>
+    <a href="{{ url_for('web.jobs.job_list') }}" class="btn btn-outline-primary mt-2">Browse Jobs</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

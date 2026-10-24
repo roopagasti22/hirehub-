@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Job Moderation{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h4 class="fw-bold mb-0"><i class="bi bi-briefcase me-2 text-success"></i>Job Moderation</h4>
+    <div class="d-flex gap-2">
+      <a href="?status=OPEN" class="btn btn-sm btn-{{ 'success' if status_filter == 'OPEN' else 'outline-success' }}">Open</a>
+      <a href="?status=CLOSED" class="btn btn-sm btn-{{ 'secondary' if status_filter == 'CLOSED' else 'outline-secondary' }}">Closed</a>
+      <a href="?" class="btn btn-sm btn-outline-dark">All</a>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Title</th><th>Location</th><th>Mode</th><th>Type</th><th>Status</th><th>Posted</th><th>Deadline</th></tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+            <tr>
+              <td class="fw-semibold"><a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="text-decoration-none">{{ job.title }}</a></td>
+              <td class="small text-muted">{{ job.location }}</td>
+              <td><span class="badge bg-info-subtle text-info">{{ job.work_mode }}</span></td>
+              <td><span class="badge bg-primary-subtle text-primary">{{ job.employment_type|replace('_',' ') }}</span></td>
+              <td><span class="badge bg-{{ 'success' if job.status == 'OPEN' else 'secondary' }}-subtle text-{{ 'success' if job.status == 'OPEN' else 'secondary' }}">{{ job.status }}</span></td>
+              <td class="small text-muted">{{ job.posted_date[:10] if job.posted_date }}</td>
+              <td class="small text-{{ 'danger' if job.deadline else 'muted' }}">{{ job.deadline[:10] if job.deadline else '–' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No jobs found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

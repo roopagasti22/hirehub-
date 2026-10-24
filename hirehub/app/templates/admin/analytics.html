@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Platform Analytics</h4>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">Jobs by Skill (Top 10)</div>
+        <div class="card-body"><canvas id="skillChart" height="260"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">Jobs by Location (Top 10)</div>
+        <div class="card-body"><canvas id="locationChart" height="260"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">Applications by Status</div>
+        <div class="card-body"><canvas id="appStatusChart" height="260"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">Monthly Applications</div>
+        <div class="card-body"><canvas id="monthlyAppChart" height="260"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">Monthly Registrations</div>
+        <div class="card-body"><canvas id="monthlyRegChart" height="260"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">Jobs by Work Mode</div>
+        <div class="card-body"><canvas id="workModeChart" height="260"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const CHART_COLORS = ['#0d6efd','#198754','#ffc107','#dc3545','#0dcaf0','#6f42c1','#fd7e14','#20c997','#6c757d','#d63384'];
+
+function mkChart(id, type, data, opts={}) {
+  return new Chart(document.getElementById(id), {
+    type,
+    data,
+    options: { responsive: true, ...opts }
+  });
+}
+
+const skillData = {{ analytics.jobs_by_skill | tojson }};
+const locationData = {{ analytics.jobs_by_location | tojson }};
+const appStatus = {{ analytics.applications_by_status | tojson }};
+const monthlyApp = {{ analytics.monthly_applications | tojson }};
+const monthlyReg = {{ analytics.monthly_registrations | tojson }};
+const workMode = {{ analytics.jobs_by_work_mode | tojson }};
+
+mkChart('skillChart', 'bar', {
+  labels: skillData.labels,
+  datasets: [{ label: 'Jobs', data: skillData.values, backgroundColor: '#0d6efd80', borderColor: '#0d6efd', borderWidth: 1 }]
+}, { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } });
+
+mkChart('locationChart', 'bar', {
+  labels: locationData.labels,
+  datasets: [{ label: 'Jobs', data: locationData.values, backgroundColor: '#19875480', borderColor: '#198754', borderWidth: 1 }]
+}, { indexAxis: 'y', scales: { x: { beginAtZero: true } }, plugins: { legend: { display: false } } });
+
+mkChart('appStatusChart', 'doughnut', {
+  labels: appStatus.labels,
+  datasets: [{ data: appStatus.values, backgroundColor: CHART_COLORS }]
+}, { plugins: { legend: { position: 'right' } } });
+
+mkChart('monthlyAppChart', 'line', {
+  labels: monthlyApp.labels,
+  datasets: [{ label: 'Applications', data: monthlyApp.values, fill: true, tension: 0.4, borderColor: '#0d6efd', backgroundColor: '#0d6efd20' }]
+}, { scales: { y: { beginAtZero: true } } });
+
+mkChart('monthlyRegChart', 'line', {
+  labels: monthlyReg.labels,
+  datasets: [{ label: 'Registrations', data: monthlyReg.values, fill: true, tension: 0.4, borderColor: '#198754', backgroundColor: '#19875420' }]
+}, { scales: { y: { beginAtZero: true } } });
+
+mkChart('workModeChart', 'pie', {
+  labels: workMode.labels,
+  datasets: [{ data: workMode.values, backgroundColor: CHART_COLORS }]
+}, { plugins: { legend: { position: 'bottom' } } });
+</script>
+{% endblock %}

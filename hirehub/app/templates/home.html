@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section py-5 text-white bg-gradient-primary">
+  <div class="container py-4">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="display-4 fw-bold mb-3">Find Your Dream Job</h1>
+        <p class="lead mb-4 opacity-75">Connect with top companies. Discover thousands of job opportunities tailored to your skills.</p>
+        <form action="{{ url_for('web.jobs.job_list') }}" method="GET" class="d-flex gap-2 flex-wrap">
+          <input type="text" name="q" class="form-control form-control-lg flex-grow-1" placeholder="Job title or keyword..." style="max-width:340px;" />
+          <input type="text" name="location" class="form-control form-control-lg" placeholder="Location..." style="max-width:200px;" />
+          <button type="submit" class="btn btn-warning btn-lg fw-bold">
+            <i class="bi bi-search me-1"></i>Search
+          </button>
+        </form>
+      </div>
+      <div class="col-lg-5 text-center d-none d-lg-block">
+        <i class="bi bi-people-fill" style="font-size:9rem;opacity:0.25;"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="bg-white border-bottom py-3 shadow-sm">
+  <div class="container">
+    <div class="row text-center g-3">
+      <div class="col-6 col-md-3">
+        <div class="fw-bold fs-3 text-primary">10K+</div>
+        <div class="small text-muted">Jobs Posted</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="fw-bold fs-3 text-success">5K+</div>
+        <div class="small text-muted">Candidates</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="fw-bold fs-3 text-info">500+</div>
+        <div class="small text-muted">Companies</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="fw-bold fs-3 text-warning">2K+</div>
+        <div class="small text-muted">Hires Made</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Jobs -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="fw-bold mb-4">Recent Job Openings</h2>
+    <div class="row g-4">
+      {% for job in recent_jobs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 job-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-primary-subtle text-primary">{{ job.employment_type|replace('_',' ')|title }}</span>
+              <span class="badge bg-success-subtle text-success">{{ job.work_mode|title }}</span>
+            </div>
+            <h5 class="card-title fw-bold">
+              <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="text-decoration-none text-dark">
+                {{ job.title }}
+              </a>
+            </h5>
+            <p class="text-muted small mb-2">
+              <i class="bi bi-building me-1"></i>{{ job.company_name or 'Company' }}
+              &nbsp;|&nbsp;
+              <i class="bi bi-geo-alt me-1"></i>{{ job.location }}
+            </p>
+            <div class="mb-3">
+              {% for skill in (job.skills or [])[:4] %}
+              <span class="badge bg-secondary-subtle text-secondary me-1">{{ skill }}</span>
+              {% endfor %}
+            </div>
+            {% if job.salary_min or job.salary_max %}
+            <p class="text-success fw-semibold small mb-0">
+              <i class="bi bi-currency-rupee"></i>
+              {{ job.salary_min|int if job.salary_min else 0 }} – {{ job.salary_max|int if job.salary_max else '?' }} LPA
+            </p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-transparent border-0">
+            <a href="{{ url_for('web.jobs.job_detail', job_id=job._id) }}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-center text-muted py-4">
+        <i class="bi bi-briefcase fs-1 d-block mb-2 opacity-50"></i>
+        No jobs posted yet. Check back soon!
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{{ url_for('web.jobs.job_list') }}" class="btn btn-primary btn-lg">Browse All Jobs</a>
+    </div>
+  </div>
+</section>
+
+<!-- How it Works -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="fw-bold text-center mb-5">How HireHub Works</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="p-4">
+          <div class="feature-icon bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:72px;height:72px;font-size:2rem;">
+            <i class="bi bi-person-plus-fill"></i>
+          </div>
+          <h5 class="fw-bold">Create Profile</h5>
+          <p class="text-muted">Sign up as a candidate, upload your resume, and fill in your skills and experience.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4">
+          <div class="feature-icon bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:72px;height:72px;font-size:2rem;">
+            <i class="bi bi-search"></i>
+          </div>
+          <h5 class="fw-bold">Discover Opportunities</h5>
+          <p class="text-muted">Browse thousands of jobs, filter by skills, location, salary, and mode.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4">
+          <div class="feature-icon bg-warning-subtle text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:72px;height:72px;font-size:2rem;">
+            <i class="bi bi-check2-circle"></i>
+          </div>
+          <h5 class="fw-bold">Get Hired</h5>
+          <p class="text-muted">Apply with one click, track your applications, and land interviews.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+{% if not user %}
+<section class="py-5 bg-primary text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Ready to take the next step?</h2>
+    <p class="lead mb-4 opacity-75">Join thousands of candidates and recruiters already using HireHub.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{{ url_for('web.auth.register') }}" class="btn btn-warning btn-lg fw-bold">Get Started Free</a>
+      <a href="{{ url_for('web.jobs.job_list') }}" class="btn btn-outline-light btn-lg">Browse Jobs</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

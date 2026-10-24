@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-file-earmark-bar-graph me-2 text-secondary"></i>Reports</h4>
+
+  <div class="row g-4">
+    <!-- Candidate Report -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="fw-bold"><i class="bi bi-person-lines-fill me-1 text-primary"></i>Candidate Report</h5>
+          <p class="text-muted small">All registered candidates with profile info.</p>
+          <form method="GET" action="{{ url_for('web.admin.report_candidates') }}" class="row g-2">
+            <div class="col-6"><input type="date" name="date_from" class="form-control form-control-sm" placeholder="From" /></div>
+            <div class="col-6"><input type="date" name="date_to" class="form-control form-control-sm" placeholder="To" /></div>
+            <div class="col-6"><button type="submit" class="btn btn-primary btn-sm w-100">View</button></div>
+            <div class="col-6"><button type="submit" name="format" value="csv" class="btn btn-outline-secondary btn-sm w-100"><i class="bi bi-download me-1"></i>CSV</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Report -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="fw-bold"><i class="bi bi-briefcase me-1 text-success"></i>Job Report</h5>
+          <p class="text-muted small">All job listings with filters.</p>
+          <form method="GET" action="{{ url_for('web.admin.report_jobs') }}" class="row g-2">
+            <div class="col-6"><input type="date" name="date_from" class="form-control form-control-sm" /></div>
+            <div class="col-6"><input type="date" name="date_to" class="form-control form-control-sm" /></div>
+            <div class="col-12">
+              <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="OPEN">Open</option>
+                <option value="CLOSED">Closed</option>
+              </select>
+            </div>
+            <div class="col-6"><button type="submit" class="btn btn-success btn-sm w-100">View</button></div>
+            <div class="col-6"><button type="submit" name="format" value="csv" class="btn btn-outline-secondary btn-sm w-100"><i class="bi bi-download me-1"></i>CSV</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Report -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="fw-bold"><i class="bi bi-file-earmark-text me-1 text-info"></i>Application Report</h5>
+          <p class="text-muted small">Application tracking data.</p>
+          <form method="GET" action="{{ url_for('web.admin.report_applications') }}" class="row g-2">
+            <div class="col-6"><input type="date" name="date_from" class="form-control form-control-sm" /></div>
+            <div class="col-6"><input type="date" name="date_to" class="form-control form-control-sm" /></div>
+            <div class="col-12">
+              <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                {% for s in ['APPLIED','UNDER_REVIEW','SHORTLISTED','INTERVIEW_SCHEDULED','SELECTED','REJECTED','WITHDRAWN'] %}
+                <option value="{{ s }}">{{ s|replace('_',' ')|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6"><button type="submit" class="btn btn-info btn-sm w-100 text-white">View</button></div>
+            <div class="col-6"><button type="submit" name="format" value="csv" class="btn btn-outline-secondary btn-sm w-100"><i class="bi bi-download me-1"></i>CSV</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
